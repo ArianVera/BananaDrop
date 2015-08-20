@@ -1,0 +1,179 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Banana Drop</title>
+<style>
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font-size: 12pt;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+	width:100%; 
+	height:100%;
+	background:url('bg.jpg') no-repeat center center fixed;
+	background-size:cover;
+	overflow:hidden;
+	cursor:none;
+}
+ol, ul {
+	list-style: none;
+}
+img{width:100%;}
+
+.inner_container{width:90%; max-width:1200px; height:100vh; margin:0 auto; position:relative; }
+
+#playing_field{width:100%; height:100%; top:0; left:0; position:absolute; border:#f00 1px solid; overflow:hidden;}
+
+
+#top_bar{width:100%; position:relative; top:25px;}
+
+#banana_score{width:40%; float:left;}
+
+#banana_score_img{width:100px; height:56.5px; background:url(banana_score.png) no-repeat center center; background-size:contain; float:left;}
+
+#banana_score_count{ font-size:250%; line-height:15pt; color:#fff; font-weight:bold; float:left; text-align:left; margin-left:5px;  position:relative; top:20px;}
+
+#score{width:20%; font-size:150%; line-height:25pt; color:#fff; float:right; text-align:left; position:relative; top:20px;}
+
+.bananas{top:0px; left:0px; position:absolute; z-index:200; width:50px; height:30px; background:url(banana.png) no-repeat;}
+
+#monkey{width: 200px; height:299px; position:absolute; display:block; bottom:-60px;  overflow:hidden;}
+
+</style>
+
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+</head>
+
+<body>
+
+<div class="inner_container">
+<div id="playing_field">
+<div id="bananaZone"></div>
+	<div id="top_bar">
+    	<div id="banana_score">
+        	<figure id="banana_score_img">
+            </figure><!--end #banana_score_img -->
+            <div id="banana_score_count">37</div>
+        </div><!-- end #banana_score -->
+        <div id="score">
+        Score: 
+        </div><!--end #score -->
+    </div><!-- end # top_bar -->
+    
+    <div id="monkey"><img src="monkey_sprite.png" alt="Monkey" /></div><!--end #monkey -->
+</div><!-- end #playing field -->    
+</div><!-- end .inner_container -->
+
+
+</body>
+
+<script>
+	
+	var monkey = $("#monkey");
+	var banana_score = $('#banana_score_count');
+	
+	var parentX = $("#playing_field");
+	var mouseX = 0, limitX = parentX.width() - monkey.width();
+	
+	$(window).mousemove(function(e){	
+		var offset = $("#playing_field").offset();
+		mouseX = Math.min(e.pageX - offset.left, limitX);
+   		if (mouseX < 0) mouseX = 0;
+	});
+	
+	// cache the selector
+	var xp = 0, yp = 0;
+	var loop = setInterval(function(){
+    // change 3 to alter damping higher is slower
+    xp += (mouseX - xp) / 2;
+    monkey.css({left:xp});
+    
+	}, 30);
+	
+	$(window).mousedown(function(e){
+		bite();
+	});
+	fallingBananas();
+	
+	
+	 function fallingBananas() {   
+        var $bananas = $(), qt = 1;
+        
+        for (var i = 0; i < qt; ++i) {
+            var $banana = $('<div class="bananas"></div>');
+            $banana.css({
+                'left': (Math.random() * $('#playing_field').width()) + 'px',
+                'top': (- Math.random() * $('#playing_field').height()) + 'px',
+				'rotate': (Math.random()*360) + 'deg'
+            });
+            // add this snowflake to the set of snowflakes
+            $bananas = $bananas.add($banana);
+        }
+        $('#bananaZone').prepend($bananas);
+    	
+        $bananas.animate({
+            top: "1000px",
+        }, Math.random() + 5000, function(){
+            $(this).remove();
+            // run again when all 20 snowflakes hit the floor
+            if (--qt < 1) {
+                fallingBananas();
+            }
+        });
+
+    }
+	
+	
+	function bite(){
+		
+		var imgHeight = 237.333333333;
+		var numImgs = 5;
+		var cont = 0;
+ 		
+		var animation = setInterval(function(){
+   			 var position =  -1 * (cont*imgHeight);
+    		$('#monkey').find('img').css('margin-top', position);    
+    		cont++;
+    		if(cont == numImgs){
+        		clearInterval(animation);
+    		}
+		},50);
+		
+		
+		if(bananaInRange())
+		{
+			banana_score.innerHTML += 1;
+		}
+	}
+	
+	function bananaInRange(){
+	}
+    
+</script>
+
+</html>
